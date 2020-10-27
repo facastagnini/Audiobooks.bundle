@@ -190,7 +190,37 @@ class AudiobookArtist(Agent.Artist):
         self.Log('* Album:           %s', media.album)
         self.Log('* Artist:           %s', media.artist)
         self.Log('****************************************Not Ready For Artist Search Yet*************************')
-        self.Log('------------------------------------------------------------------------------------------------')	
+        self.Log('------------------------------------------------------------------------------------------------')
+        
+        '''
+        We can get the id from the search results with the right xpath
+        <a class="bc-link bc-color-link" tabindex="0" href="/author/Cixin-Liu/B007JP96JU?ref=a_search_c3_lAuthor_1_1_1&amp;pf_rd_p=e81b7c27-6880-467a-b5a7-13cef5d729fe&amp;pf_rd_r=0A2J9TTD5NYVNKMKG12Y">Cixin Liu</a>
+        
+        Then we can use the id to visit the author's bio page
+
+        author_page = 'http://www.audible.com/author/B007JP96JU'
+
+        search_results = 'http://www.audible.com/search?keywords=cixin+liu?ipRedirectOverride=true'
+
+        html = HTML.ElementFromURL(search_results, sleep=REQUEST_DELAY)
+        for r in html.xpath('/html/body/div[1]/div[5]/div[3]/div/div[2]/div[4]/div/span/ul/div/li[1]/div/div[1]/div'):
+            id = self.getStringContentFromXPath(r, '/html/body/div[1]/div[5]/div[3]/div/div[2]/div[4]/div/span/ul/div/li[1]/div/div[1]/div/div[2]/div/div/span/ul/li[2]/span/a[1]')        
+            self.Log('***************ID: %s, ', id)
+        return
+        '''
+
+        author_bio = 'http://www.audible.com/author/B007JP96JU'
+        html = HTML.ElementFromURL(author_bio, sleep=REQUEST_DELAY)
+        self.Log('-----------------------------ABOUT TO TRY XPATH--------------------------')
+        for r in html.xpath('//*[@id="center-1"]'):            
+            self.Log('---------------------------------------XPATH SEARCH HIT-----------------------------------------------')
+            # try to get the author bio and pic
+            thumb = self.getImageUrlFromXPath(r, '/html/body/div[1]/div[8]/div[2]/div[2]/div/div/div/div/div/div[1]/img')
+            artist_Bio = self.getStringContentFromXPath(r, '/html/body/div[1]/div[8]/div[2]/div[2]/div/div/div/div/div/div[6]/div/div/p[1]')
+            
+            # display the results
+            self.Log('***************BIO: %s, ', artist_Bio)
+            self.Log('***************THUMB: %s, ', thumb)
         return
 	
 		
